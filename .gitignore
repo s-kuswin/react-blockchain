@@ -1,0 +1,7 @@
+.history/*
+/blockchain-frontend/.history/*
+/blockchain-frontend/node_modules/*
+/blockchain-backend/.history/*
+/blockchain-backend/node_modules/*
+blockchain-frontend/.DS_Store
+.DS_Store
