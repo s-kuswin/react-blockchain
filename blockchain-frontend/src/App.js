@@ -5,13 +5,11 @@ import {
   getTransactions,
   getMempool,
   getBalance,
-  createWallet,
-  importWallet,
   submitTransaction,
   mineBlock
 } from './api';
 import WalletTab from './components/WalletTab';
-import Wallet from './utils/index';
+import { Wallet, createWallet, importWallet} from './utils/wallet';
 import Transfer from './components/TransferTab';
 import Miner from './components/MinerTab';
 import Explorer from './components/ExplorerTab';
@@ -105,17 +103,8 @@ function App() {
   // 创建新钱包
   const handleCreateWallet = async () => {
     try {
-      const response = await createWallet();
-      const walletData = response.data;
-      
-      // 使用Wallet类创建钱包实例
-      const wallet = new Wallet(
-        walletData.mnemonic,
-        walletData.address,
-        walletData.privateKey,
-        walletData.publicKey
-      );
-      
+      const wallet = await createWallet();
+      console.log('Created wallet:', wallet);
       setCurrentWallet(wallet);
       wallet.saveToLocalStorage(); // 使用Wallet类的方法保存到本地存储
       showNotification('钱包创建成功', 'success');
@@ -133,16 +122,7 @@ function App() {
   // 导入钱包
   const handleImportWallet = async (mnemonic) => {
     try {
-      const response = await importWallet(mnemonic);
-      const walletData = response.data;
-      
-      // 使用Wallet类创建钱包实例
-      const wallet = new Wallet(
-        mnemonic,
-        walletData.address,
-        walletData.privateKey,
-        walletData.publicKey
-      );
+      const wallet = await importWallet(mnemonic);
       
       // 使用Wallet类的方法保存到本地存储
       wallet.saveToLocalStorage();
@@ -198,10 +178,10 @@ function App() {
       const signedTx = await currentWallet.signTransaction(tx);
       
       // 将交易提交到内存池
-      await submitTransaction(signedTx);
-      
+      const {  data:resData } = await submitTransaction(signedTx);
+      const { message, code } = resData;
       // 更新UI
-      showNotification(`交易已提交到内存池`, 'success');
+      showNotification(message, code === 200 ? 'success' : 'error');
       
       // 刷新区块链数据
       fetchBlockchainData();

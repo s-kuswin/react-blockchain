@@ -39,12 +39,12 @@ const ExplorerTab = ({ blockchain }) => {
                 blockchain.blocks.map((block) => (
                   <div key={block.id || block.hash} className="block-item">
                     <div className="block-header">
-                      <span className="block-hash">区块哈希: {block.hash?.substring(0, 20)}...</span>
-                      <span className="block-height">区块高度: #{block.height}</span>
+                      <p className="block-hash">区块哈希: {block.hash}</p>
+                      <p className="block-height">区块高度: #{block.height}</p>
                     </div>
                     <div className="block-details">
                       <p>交易数: {block.txs || 0}</p>
-                      <p>矿工: {block.miner ? block.miner.substring(0, 20) + '...' : 'N/A'}</p>
+                      <p>矿工: {block.miner ? block.miner : 'N/A'}</p>
                       <p>奖励: {block.reward || 0} token</p>
                       <p>时间戳: {block.timestamp ? new Date(block.timestamp).toLocaleString() : 'N/A'}</p>
                     </div>
@@ -65,11 +65,11 @@ const ExplorerTab = ({ blockchain }) => {
                 blockchain.transactions.map((tx) => (
                   <div key={tx.hash} className="transaction-item">
                     <div className="transaction-header">
-                      <span className="transaction-hash">交易哈希: {tx.hash?.substring(0, 20)}...</span>
+                      <span className="transaction-hash">交易哈希: {tx.hash}</span>
                     </div>
                     <div className="transaction-details">
-                      <p>发送方: {tx.from ? tx.from.substring(0, 20) + '...' : 'N/A'}</p>
-                      <p>接收方: {tx.to ? tx.to.substring(0, 20) + '...' : 'N/A'}</p>
+                      <p>发送方: {tx.from ? tx.from : 'N/A'}</p>
+                      <p>接收方: {tx.to ? tx.to : 'N/A'}</p>
                       <p>金额: {tx.amount || 0} {tx.denom || 'token'}</p>
                       <p>时间戳: {tx.timestamp ? new Date(tx.timestamp).toLocaleString() : 'N/A'}</p>
                     </div>

@@ -15,12 +15,6 @@ router.get('/height', blockchainController.getHeight);
 // 获取账户余额
 router.get('/balance/:address', blockchainController.getBalance);
 
-// 创建钱包
-router.post('/wallet/create', blockchainController.createWallet);
-
-// 导入钱包
-router.post('/wallet/import', blockchainController.importWallet);
-
 // 提交交易到内存池
 router.post('/transaction', blockchainController.submitTransaction);
 

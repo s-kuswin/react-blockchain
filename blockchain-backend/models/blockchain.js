@@ -38,9 +38,9 @@ class Blockchain {
         
         // 检查发送方是否有足够余额
         const fromBalance = this.accounts.get(tx.from) || 0;
-        console.log('fromBalance', fromBalance);
+
         const sendAmount = parseInt(tx.amount);
-        console.log('sendAmount', sendAmount);
+
         if (fromBalance < sendAmount) {
             return false;
         }
@@ -152,11 +152,14 @@ class Blockchain {
         console.log(`⛏️  矿工收到交易: ${tx.from} → ${tx.to}`, tx)
         if (!tx.from || !tx.to || !tx.amount || !tx.signature) {
             console.log(`❌ 交易格式无效`);
-            return;
+            return false
         }
+
+        if(!this.verifyTransaction(tx)) return false;
         
         this.mempool.push(tx);
         console.log(`⛏️  收到交易: ${tx.from} → ${tx.to}`);
+        return true
     }
 
     // 打包交易并出块

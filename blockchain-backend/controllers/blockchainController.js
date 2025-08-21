@@ -1,5 +1,4 @@
 const Blockchain = require('../models/blockchain');
-const { createWallet: createWalletModel, importWallet: importWalletModel } = require('../models/wallet');
 
 // 初始化区块链实例
 const blockchain = new Blockchain();
@@ -18,52 +17,13 @@ exports.getBalance = (req, res) => {
     res.json(balance);
 };
 
-// 创建钱包
-exports.createWallet = async (req, res) => {
-    try {
-        const wallet = await createWalletModel();
-        blockchain.addAccount(wallet.address, 100000000);
-        res.json({
-            mnemonic: wallet.mnemonic,
-            address: wallet.address,
-            publicKey: wallet.publicKey,
-            privateKey: wallet.privateKey
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-// 导入钱包
-exports.importWallet = async (req, res) => {
-    try {
-        const { mnemonic } = req.body;
-        if (!mnemonic) {
-            return res.status(400).json({ error: '助记词不能为空' });
-        }
-        
-        const wallet = await importWalletModel(mnemonic);
-        
-        // 如果账户不存在则添加
-        if (!blockchain.accounts.has(wallet.address)) {
-            blockchain.addAccount(wallet.address, 100000000);
-        }
-        
-        res.json({
-            address: wallet.address,
-            publicKey: wallet.publicKey
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
 // 提交交易到内存池
 exports.submitTransaction = (req, res) => {
     try {
         const tx = req.body;
-        blockchain.receiveTx(tx);
-        res.json({ message: '交易已提交到内存池' });
+        const isSubmit =  blockchain.receiveTx(tx);
+        console.log(isSubmit, '提价交易提示');
+        res.json({ message: isSubmit ? '交易已提交到内存池' : '交易失败', code: isSubmit ? 200 : -1 });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
