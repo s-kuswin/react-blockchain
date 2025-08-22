@@ -14,6 +14,35 @@ class Blockchain {
         this.transactions = []; // 已确认交易
         this.blocks = [];
         this.mempool = []; // 待处理交易池
+        
+        // 创建创世区块
+        this.createGenesisBlock();
+    }
+
+    // 创建创世区块
+    createGenesisBlock() {
+        const genesisBlock = {
+            height: 0,
+            previousHash: '0'.repeat(64), // 创世区块的前一个哈希为0
+            txs: 0,
+            reward: 0,
+            miner: 'genesis',
+            timestamp: Date.now(),
+            transactions: [],
+            id: uuidv4()
+        };
+        
+        // 计算创世区块哈希
+        const blockHeader = JSON.stringify({
+            height: genesisBlock.height,
+            previousHash: genesisBlock.previousHash,
+            timestamp: genesisBlock.timestamp,
+            miner: genesisBlock.miner,
+            txs: genesisBlock.txs
+        });
+        genesisBlock.hash = this.sha256(blockHeader);
+        
+        this.blocks.push(genesisBlock);
     }
 
     addAccount(address, amount = 100000000) {
@@ -127,15 +156,7 @@ class Blockchain {
     }
 
     getLatestBlock() {
-        return {
-            header: {
-                height: this.height,
-                chainId: this.chainId,
-                time: new Date(this.blockTime + this.height * 7000).toISOString(),
-            },
-            numTxs: 0,
-            data: [],
-        };
+        return this.blocks[this.blocks.length - 1];
     }
     
     getBlocks() {
@@ -209,9 +230,14 @@ class Blockchain {
             !processedTxHashes.includes(tx.hash)
         );
 
+        // 获取前一个区块的哈希
+        const previousBlock = this.getLatestBlock();
+        const previousHash = previousBlock ? previousBlock.hash : '0'.repeat(64);
+
         // 创建新区块
         const blockData = {
-            height: ++this.height,
+            height: previousBlock ? previousBlock.height + 1 : 1,
+            previousHash: previousHash, // 添加指向前一个区块的哈希
             txs: validTransactions.length,
             reward: rewardAmount,
             miner: minerAddress,
@@ -223,6 +249,7 @@ class Blockchain {
         // 计算区块哈希
         const blockHeader = JSON.stringify({
             height: blockData.height,
+            previousHash: blockData.previousHash,
             timestamp: blockData.timestamp,
             miner: blockData.miner,
             txs: blockData.txs
@@ -230,6 +257,7 @@ class Blockchain {
         blockData.hash = this.sha256(blockHeader);
         
         this.addBlock(blockData);
+        this.height = blockData.height;
 
         console.log(`✅ 成功出块！获得奖励: ${rewardAmount} token`);
         return blockData;
